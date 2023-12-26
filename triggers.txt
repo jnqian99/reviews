@@ -1,0 +1,40 @@
+-- Create Insert Trigger on review table
+
+CREATE TRIGGER reviewInsertTrig ON review
+AFTER INSERT
+AS
+BEGIN
+    UPDATE B1
+    SET B1.review_count = (SELECT COUNT(*) FROM review R1 
+                           WHERE R1.business_id = B1.business_id
+                           AND R1.date=(SELECT MAX(R4.date) FROM review R4 
+                                        WHERE R4.user_id=R1.user_id 
+				        AND R4.business_id=R1.business_id)
+                          )
+    FROM business B1, inserted i
+    WHERE B1.business_id = i.business_id
+
+    UPDATE B2
+    SET B2.stars = (SELECT CAST (SUM(R2.stars) AS FLOAT)/COUNT(*)
+                    FROM review R2 
+                    WHERE R2.business_id = B2.business_id
+                    AND R2.date = (SELECT MAX(R3.date) FROM review R3 
+                                   WHERE R3.user_id=R2.user_id 
+				   AND R3.business_id=R2.business_id)
+                                  )
+    FROM business B2, inserted i2
+    WHERE B2.business_id = i2.business_id;
+END;
+
+-- Create Insert Trigger on tip table
+
+CREATE TRIGGER tipInsertTrig ON tip
+AFTER INSERT
+AS
+BEGIN
+    DELETE T
+    FROM tip T, inserted i
+    WHERE T.tip_id=i.tip_id AND
+        NOT EXISTS ( SELECT * FROM review R WHERE R.user_id=T.user_id AND R.business_id=T.business_id )
+END;
+

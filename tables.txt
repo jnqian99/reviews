@@ -1,0 +1,98 @@
+-- Drop existing tables if they already exist
+
+DROP TABLE checkin;
+DROP TABLE tip;
+DROP TABLE review;
+DROP TABLE friendship;
+DROP TABLE user_yelp;
+DROP TABLE business;
+
+-- Start Creating tables
+
+CREATE TABLE business (
+    business_id CHAR(22) PRIMARY KEY,
+    name VARCHAR(60) NOT NULL,
+    address VARCHAR(75),
+    city VARCHAR(30) NOT NULL,
+    postal_code VARCHAR(7),
+    stars DECIMAL(2, 1) CHECK (stars >= 1 AND stars <= 5),
+    review_count INT DEFAULT 0 CHECK (review_count >= 0)
+);
+
+CREATE TABLE checkin (
+    checkin_id INT PRIMARY KEY,
+    business_id CHAR(22) NOT NULL,
+    date DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    FOREIGN KEY (business_id) REFERENCES business(business_id)
+        ON DELETE NO ACTION
+        ON UPDATE NO ACTION
+);
+
+CREATE TABLE user_yelp (
+    user_id CHAR(22) PRIMARY KEY,
+    name VARCHAR(35) NOT NULL,
+    review_count INT DEFAULT 0 CHECK (review_count >= 0),
+    yelping_since DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    useful INT DEFAULT 0 CHECK (useful >= 0),
+    funny INT DEFAULT 0 CHECK (funny >= 0),
+    cool INT DEFAULT 0 CHECK (cool >= 0),
+    fans INT DEFAULT 0 CHECK (fans >= 0),
+    average_stars DECIMAL(3, 2) CHECK (average_stars >= 1 AND average_stars <= 5)
+);
+
+CREATE TABLE tip (
+    tip_id INT PRIMARY KEY,
+    user_id CHAR(22) NOT NULL,
+    business_id CHAR(22) NOT NULL,
+    date DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    compliment_count INT DEFAULT 0 CHECK (compliment_count >= 0),
+    FOREIGN KEY (user_id) REFERENCES user_yelp(user_id)
+        ON DELETE NO ACTION
+        ON UPDATE NO ACTION,
+    FOREIGN KEY (business_id) REFERENCES business(business_id)
+        ON DELETE NO ACTION
+        ON UPDATE NO ACTION
+);
+
+CREATE TABLE friendship (
+    user_id CHAR(22),
+    friend CHAR(22),
+    PRIMARY KEY (user_id, friend),
+    FOREIGN KEY (user_id) REFERENCES user_yelp(user_id)
+        ON DELETE NO ACTION
+        ON UPDATE NO ACTION,
+    FOREIGN KEY (friend) REFERENCES user_yelp(user_id)
+        ON DELETE NO ACTION
+        ON UPDATE NO ACTION
+);
+
+CREATE TABLE review (
+    review_id CHAR(22) PRIMARY KEY,
+    user_id CHAR(22) NOT NULL,
+    business_id CHAR(22) NOT NULL,
+    stars INT NOT NULL CHECK (stars >= 1 AND stars <= 5),
+    useful INT DEFAULT 0 CHECK (useful >= 0),
+    funny INT DEFAULT 0 CHECK (funny >= 0),
+    cool INT DEFAULT 0 CHECK (cool >= 0),
+    date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES user_yelp(user_id)
+        ON DELETE NO ACTION
+        ON UPDATE NO ACTION,
+    FOREIGN KEY (business_id) REFERENCES business(business_id)
+        ON DELETE NO ACTION
+        ON UPDATE NO ACTION
+);
+
+BULK INSERT dbo.business FROM 'c:\sampletables\business.csv' WITH (fieldterminator=',', rowterminator='\n', firstrow=2);
+
+BULK INSERT dbo.user_yelp FROM 'c:\sampletables\user_yelp.csv' WITH (fieldterminator=',', rowterminator='\n', firstrow=2);
+
+BULK INSERT dbo.checkin FROM 'c:\sampletables\jnqian354\checkin.csv' WITH (fieldterminator=',', rowterminator='\n', firstrow=2);
+
+BULK INSERT dbo.tip FROM 'c:\sampletables\tip.csv' WITH (fieldterminator=',', rowterminator='\n', firstrow=2);
+
+BULK INSERT dbo.friendship FROM 'c:\sampletables\friendship.csv' WITH (fieldterminator=',', rowterminator='\n', firstrow=2);
+
+BULK INSERT dbo.review FROM 'c:\sampletables\review.csv' WITH (fieldterminator=',', rowterminator='\n', firstrow=2);
+
+
