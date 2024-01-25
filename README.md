@@ -1,8 +1,6 @@
 In console run python review.py, then enter a valid user_id and press ENTER,
 the main menu will show:
 
-![](./mdimages/media/image1.png)
-
 Choose between 1-5 from the Main Menu then press ENTER
 
 \* When 1 (Search Business) is chosen from Main Menu, enter the
