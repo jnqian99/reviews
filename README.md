@@ -54,6 +54,3 @@ The triggers will automatically update review_count and avg_stars for
 the reviewed business
 
 \* Choose 5 (Exit) from the Main Menu to exit from the program
-
-![A black screen with white text Description automatically
-generated](./mdimages/media/image10.png)
